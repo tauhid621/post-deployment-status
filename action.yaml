@@ -14,7 +14,7 @@ runs:
         REPORT="${TITLE}\r\nLink to run - https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\r\n" 
         RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
         REPORT="${REPORT}\r\n"
-        if [ $DEP_STATUS == 'success' ]; then REPORT="${REPORT}\r\n|✅|<${RUN_URL}|deployment>"; else REPORT="${REPORT}\r\n|❌|<${RUN_URL}|deployment>"; fi
+        if [ $DEP_URL != "" ]; then REPORT="${REPORT}\r\n|✅|<${RUN_URL}|action_run>|<$DEP_URL|deployment>"; else REPORT="${REPORT}\r\n|❌|<${RUN_URL}|deployment>"; fi
         echo "::set-output name=report::$REPORT"
     - name: Send slack deployment status
       shell: bash
