@@ -1,0 +1,21 @@
+name: 'Post deployment status'
+description: 'Post deployment status to relevant channels'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create slack post
+      id: slack_report
+      shell: bash
+      run: |
+        TITLE="Deployment report - "
+        DATEVAR=`date "+%d/%m/%YT%H:%M:%S"`
+        TITLE="${TITLE}${DATEVAR}"
+        REPORT="${TITLE}\r\nLink to run - https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\r\n" 
+        RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        REPORT="${REPORT}\r\n"
+        if [ $DEP_STATUS == 'success' ]; then REPORT="${REPORT}\r\n|✅|<${RUN_URL}|deployment>"; else REPORT="${REPORT}\r\n|❌|<${RUN_URL}|deployment>"; fi
+        echo "::set-output name=report::$REPORT"
+    - name: Send slack deployment status
+      shell: bash
+      run: curl -X POST -H 'Content-type:application/json' --data '{"blocks":[{"type":"section","text":{"type":"mrkdwn","text":"${{steps.slack_report.outputs.report}}"}}]}' https://hooks.slack.com/services/$SLACK_CHANNEL_SECRET
